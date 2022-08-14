@@ -59,7 +59,7 @@ use crate::error::{Error as GpapiError, ErrorKind as GpapiErrorKind};
 use googleplay_protobuf::{
     AndroidCheckinProto, AndroidCheckinRequest, AndroidCheckinResponse, BulkDetailsRequest,
     BulkDetailsResponse, DetailsResponse, DeviceConfigurationProto, ResponseWrapper,
-    UploadDeviceConfigRequest, UploadDeviceConfigResponse,
+    UploadDeviceConfigRequest, UploadDeviceConfigResponse, SearchResponse,
 };
 
 #[macro_use]
@@ -428,6 +428,29 @@ impl Gpapi {
             }
         }
         Err(GpapiError::new(GpapiErrorKind::InvalidApp))
+    }
+
+    /// Search the play store for an app.
+    ///
+    /// # Arguments
+    ///
+    /// * `query` - A string type specifying the search query, e.g. `insta`
+    pub async fn search<S: Into<String>>(
+        &self,
+        query: S,
+    ) -> Result<Option<SearchResponse>, GpapiError> {
+        let query = query.into();
+        let mut req = HashMap::new();
+        req.insert("q", &query[..]);
+        req.insert("s", "3");
+        let resp = self
+            .execute_request_v2("search", Some(req), None, HeaderMap::new())
+            .await?;
+        if let Some(payload) = resp.payload {
+            Ok(payload.search_response)
+        } else {
+            Ok(None)
+        }
     }
 
     /// Play Store package detail request (provides more detail than bulk requests).

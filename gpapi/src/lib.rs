@@ -446,6 +446,7 @@ impl Gpapi {
         let resp = self
             .execute_request_v2("search", Some(req), None, HeaderMap::new())
             .await?;
+        println!("{:?}", resp);
         if let Some(payload) = resp.payload {
             Ok(payload.search_response)
         } else {

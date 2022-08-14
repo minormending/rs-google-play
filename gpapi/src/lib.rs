@@ -442,7 +442,7 @@ impl Gpapi {
         let query = query.into();
         let mut req = HashMap::new();
         req.insert("q", &query[..]);
-        req.insert("s", "3");
+        req.insert("c", "3");
         let resp = self
             .execute_request_v2("search", Some(req), None, HeaderMap::new())
             .await?;
